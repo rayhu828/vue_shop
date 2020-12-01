@@ -1,6 +1,10 @@
 <template>
     <div class="login_container">
-        <div class="login_box"></div>
+        <div class="login_box">
+            <div class="avatar-box">
+                <img src="../assets/logo.png"/>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -23,5 +27,23 @@ export default {
     height: 300px;
     background-color: #FFFFFF;
     border-radius: 3px;
+    .avatar-box {
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 130px;
+        height: 130px;
+        border: 1px solid #EEEEEE;
+        border-radius: 50%;
+        padding: 10px;
+        box-shadow: 0 0 10px #DDDDDD;
+        background-color: #FFFFFF;
+        img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #EEEEEE;
+        }
+    }
 }
 </style>
