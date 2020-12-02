@@ -4,11 +4,11 @@
       <div class="avatar-box">
         <img src="../assets/logo.png" />
       </div>
-      <el-form :model="loginForm" label-width="0" class="login_form">
-        <el-form-item>
+      <el-form :model="loginForm" :rules="loginFormRules" label-width="0" class="login_form">
+        <el-form-item prop="username">
           <el-input prefix-icon="iconfont icon-user" v-model="loginForm.username"></el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="password">
           <el-input prefix-icon="iconfont icon-3702mima" v-model="loginForm.password" type="password"></el-input>
         </el-form-item>
         <el-form-item class="btns">
@@ -24,8 +24,36 @@ export default {
   data: function() {
     return {
       loginForm: {
-        username: 'zs',
-        password: '123'
+        username: '',
+        password: ''
+      },
+      loginFormRules: {
+        username: [
+          {
+            required: true,
+            message: '请输入登录名称',
+            trigger: 'blur'
+          },
+          {
+            min: 3,
+            max: 10,
+            message: '登录名称长度在3到10个字符之间',
+            trigger: 'blur'
+          }
+        ],
+        password: [
+          {
+            required: true,
+            message: '请输入登录密码',
+            trigger: 'blur'
+          },
+          {
+            min: 6,
+            max: 15,
+            message: '登录密码长度在6到15个字符之间',
+            trigger: 'blur'
+          }
+        ]
       }
     }
   }
