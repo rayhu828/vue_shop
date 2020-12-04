@@ -24,8 +24,8 @@ export default {
   data: function() {
     return {
       loginForm: {
-        username: '',
-        password: ''
+        username: 'admin',
+        password: '123456'
       },
       loginFormRules: {
         username: [
@@ -71,6 +71,9 @@ export default {
           return this.$message.error('登录失败');
         }
         this.$message.success('登录成功');
+        // token只应在当前网站打开期间生效，所以保存在sessionStorage中
+        window.sessionStorage.setItem('token', res.data.token);
+        this.$router.push('/home');
       });
     }
   }
