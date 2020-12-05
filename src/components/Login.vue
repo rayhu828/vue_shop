@@ -4,12 +4,25 @@
       <div class="avatar-box">
         <img src="../assets/logo.png" />
       </div>
-      <el-form :model="loginForm" :rules="loginFormRules" ref="loginFormRef" label-width="0" class="login_form">
+      <el-form
+        :model="loginForm"
+        :rules="loginFormRules"
+        ref="loginFormRef"
+        label-width="0"
+        class="login_form"
+      >
         <el-form-item prop="username">
-          <el-input prefix-icon="iconfont icon-user" v-model="loginForm.username"></el-input>
+          <el-input
+            prefix-icon="iconfont icon-user"
+            v-model="loginForm.username"
+          ></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input prefix-icon="iconfont icon-3702mima" v-model="loginForm.password" type="password"></el-input>
+          <el-input
+            prefix-icon="iconfont icon-3702mima"
+            v-model="loginForm.password"
+            type="password"
+          ></el-input>
         </el-form-item>
         <el-form-item class="btns">
           <el-button type="primary" @click="login">登录</el-button>
@@ -21,62 +34,62 @@
 </template>
 <script>
 export default {
-  data: function() {
+  data: function () {
     return {
       loginForm: {
         username: 'admin',
-        password: '123456'
+        password: '123456',
       },
       loginFormRules: {
         username: [
           {
             required: true,
             message: '请输入登录名称',
-            trigger: 'blur'
+            trigger: 'blur',
           },
           {
             min: 3,
             max: 10,
             message: '登录名称长度在3到10个字符之间',
-            trigger: 'blur'
-          }
+            trigger: 'blur',
+          },
         ],
         password: [
           {
             required: true,
             message: '请输入登录密码',
-            trigger: 'blur'
+            trigger: 'blur',
           },
           {
             min: 6,
             max: 15,
             message: '登录密码长度在6到15个字符之间',
-            trigger: 'blur'
-          }
-        ]
-      }
+            trigger: 'blur',
+          },
+        ],
+      },
     }
   },
   methods: {
-    resetLoginForm: function() {
-      this.$refs.loginFormRef.resetFields();
+    resetLoginForm: function () {
+      this.$refs.loginFormRef.resetFields()
     },
-    login: function() {
-      this.$refs.loginFormRef.validate(async(valid) => {
-        if(!valid) {
-          return;
+    login: function () {
+      this.$refs.loginFormRef.validate(async (valid) => {
+        if (!valid) {
+          return
         }
-        const {data:res} = await this.$http.post('login', this.loginForm);
-        if(res.meta.status !== 200) {
-          return this.$message.error('登录失败');
+        const { data: res } = await this.$http.post('login', this.loginForm)
+        if (res.meta.status !== 200) {
+          return this.$message.error('登录失败')
         }
-        this.$message.success('登录成功');
+        this.$message.success('登录成功')
         // token只应在当前网站打开期间生效，所以保存在sessionStorage中
-        window.sessionStorage.setItem('token', res.data.token);
-        this.$router.push('/home');
-      });
-    }
-  }
+        window.sessionStorage.setItem('token', res.data.token)
+        this.$router.push('/home')
+      })
+    },
+  },
 }
 </script>
 <style lang="less" scoped>
@@ -114,14 +127,14 @@ export default {
   }
 }
 .login_form {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    padding: 0 20px;
-    box-sizing: border-box;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 .btns {
-    display: flex;
-    justify-content: flex-end;
+  display: flex;
+  justify-content: flex-end;
 }
 </style>
