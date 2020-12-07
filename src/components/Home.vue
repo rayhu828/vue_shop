@@ -42,11 +42,27 @@
 </template>
 <script>
 export default {
+  data: function () {
+    return {
+      menuList: [],
+    }
+  },
   methods: {
+    getMenuList: async function () {
+      const { data: res } = await this.$http.get('menus')
+      console.log(res)
+      if(res.meta.status !== 200) {
+        return this.$message.error(res.meta.msg)
+      }
+      this.menuList = res.data
+    },
     logout: function () {
       window.sessionStorage.clear()
       this.$router.push('/login')
     },
+  },
+  created: function () {
+    this.getMenuList()
   },
 }
 </script>
