@@ -11,33 +11,47 @@
     <!-- 页面主体区域 -->
     <el-container>
       <!-- 侧边栏 -->
-      <el-aside width="200px">
+      <el-aside :width="isCollapse ? '64px' : '200px'">
+        <div class="toggle-button" @click="toggleCollapse">|||</div>
         <!-- 侧边栏菜单区域 -->
         <el-menu
           background-color="#333744"
           text-color="#FFFFFF"
           active-text-color="#409EFF"
           :unique-opened="true"
+          :collapse="isCollapse"
+          :collapse-transition="false"
+          :router="true"
         >
           <!-- 一级菜单 -->
-          <el-submenu :index="item.id + ''" v-for="item in menuList" :key="item.id">
+          <el-submenu
+            :index="item.id + ''"
+            v-for="item in menuList"
+            :key="item.id"
+          >
             <!-- 一级菜单的模板区域 -->
             <template slot="title">
               <i :class="iconsObj[item.id]"></i>
-              <span>{{item.authName}}</span>
+              <span>{{ item.authName }}</span>
             </template>
             <!-- 二级菜单 -->
-            <el-menu-item :index="subItem.id + ''" v-for="subItem in item.children" :key="subItem.id">
+            <el-menu-item
+              :index="'/' + subItem.path"
+              v-for="subItem in item.children"
+              :key="subItem.id"
+            >
               <template slot="title">
                 <i class="el-icon-menu"></i>
-                <span>{{subItem.authName}}</span>
+                <span>{{ subItem.authName }}</span>
               </template>
             </el-menu-item>
           </el-submenu>
         </el-menu>
       </el-aside>
       <!-- 内容主体区域 -->
-      <el-main>Main</el-main>
+      <el-main>
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -51,15 +65,16 @@ export default {
         103: 'iconfont icon-tijikongjian',
         101: 'iconfont icon-shangpin',
         102: 'iconfont icon-danju',
-        145: 'iconfont icon-baobiao'
-      }
+        145: 'iconfont icon-baobiao',
+      },
+      isCollapse: false,
     }
   },
   methods: {
     getMenuList: async function () {
       const { data: res } = await this.$http.get('menus')
       console.log(res)
-      if(res.meta.status !== 200) {
+      if (res.meta.status !== 200) {
         return this.$message.error(res.meta.msg)
       }
       this.menuList = res.data
@@ -67,6 +82,9 @@ export default {
     logout: function () {
       window.sessionStorage.clear()
       this.$router.push('/login')
+    },
+    toggleCollapse: function () {
+      this.isCollapse = !this.isCollapse
     },
   },
   created: function () {
@@ -105,5 +123,14 @@ export default {
 }
 .iconfont {
   margin-right: 10px;
+}
+.toggle-button {
+  background-color: #4a5064;
+  font-size: 10px;
+  line-height: 24px;
+  color: #ffffff;
+  text-align: center;
+  letter-spacing: 2px;
+  cursor: pointer;
 }
 </style>
