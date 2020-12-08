@@ -8,6 +8,7 @@
     </el-breadcrumb>
     <!-- 卡片视图区域 -->
     <el-card>
+      <!-- 搜索与添加区域 -->
       <el-row :gutter="20">
         <el-col :span="8">
           <el-input placeholder="请输入内容">
@@ -18,6 +19,23 @@
           <el-button type="primary">添加用户</el-button>
         </el-col>
       </el-row>
+      <!-- 用户列表区域 -->
+      <el-table :data="userList" :border="true" :stripe="true">
+        <el-table-column type="index" label="#"></el-table-column>
+        <el-table-column label="姓名" prop="username"></el-table-column>
+        <el-table-column label="邮箱" prop="email"></el-table-column>
+        <el-table-column label="电话" prop="mobile"></el-table-column>
+        <el-table-column label="角色" prop="role_name"></el-table-column>
+        <el-table-column label="状态">
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.mg_state"
+            >
+            </el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作"></el-table-column>
+      </el-table>
     </el-card>
   </div>
 </template>
@@ -32,7 +50,7 @@ export default {
       },
       userList: [],
       pagenum: 1,
-      total: 0
+      total: 0,
     }
   },
   methods: {
@@ -40,7 +58,7 @@ export default {
       const { data: res } = await this.$http.get('users', {
         params: this.queryInfo,
       })
-      if(res.meta.status !== 200) {
+      if (res.meta.status !== 200) {
         return this.$message.error(res.meta.msg)
       }
       this.userList = res.data.users
