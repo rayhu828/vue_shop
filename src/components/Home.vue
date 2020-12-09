@@ -25,11 +25,7 @@
           :default-active="activePath"
         >
           <!-- 一级菜单 -->
-          <el-submenu
-            :index="item.id + ''"
-            v-for="item in menuList"
-            :key="item.id"
-          >
+          <el-submenu :index="item.id + ''" v-for="item in menuList" :key="item.id">
             <!-- 一级菜单的模板区域 -->
             <template slot="title">
               <i :class="iconsObj[item.id]"></i>

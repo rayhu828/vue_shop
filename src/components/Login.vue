@@ -12,10 +12,7 @@
         class="login_form"
       >
         <el-form-item prop="username">
-          <el-input
-            prefix-icon="iconfont icon-user"
-            v-model="loginForm.username"
-          ></el-input>
+          <el-input prefix-icon="iconfont icon-user" v-model="loginForm.username"></el-input>
         </el-form-item>
         <el-form-item prop="password">
           <el-input
