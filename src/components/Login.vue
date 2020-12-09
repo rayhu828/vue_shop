@@ -34,48 +34,48 @@
 </template>
 <script>
 export default {
-  data: function () {
+  data: function() {
     return {
       loginForm: {
         username: 'admin',
-        password: '123456',
+        password: '123456'
       },
       loginFormRules: {
         username: [
           {
             required: true,
             message: '请输入登录名称',
-            trigger: 'blur',
+            trigger: 'blur'
           },
           {
             min: 3,
             max: 10,
             message: '登录名称长度在3到10个字符之间',
-            trigger: 'blur',
-          },
+            trigger: 'blur'
+          }
         ],
         password: [
           {
             required: true,
             message: '请输入登录密码',
-            trigger: 'blur',
+            trigger: 'blur'
           },
           {
             min: 6,
             max: 15,
             message: '登录密码长度在6到15个字符之间',
-            trigger: 'blur',
-          },
-        ],
-      },
+            trigger: 'blur'
+          }
+        ]
+      }
     }
   },
   methods: {
-    resetLoginForm: function () {
+    resetLoginForm: function() {
       this.$refs.loginFormRef.resetFields()
     },
-    login: function () {
-      this.$refs.loginFormRef.validate(async (valid) => {
+    login: function() {
+      this.$refs.loginFormRef.validate(async valid => {
         if (!valid) {
           return
         }
@@ -88,8 +88,8 @@ export default {
         window.sessionStorage.setItem('token', res.data.token)
         this.$router.push('/home')
       })
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="less" scoped>

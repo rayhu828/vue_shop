@@ -59,7 +59,7 @@
 </template>
 <script>
 export default {
-  data: function () {
+  data: function() {
     return {
       menuList: [],
       iconsObj: {
@@ -67,25 +67,25 @@ export default {
         103: 'iconfont icon-tijikongjian',
         101: 'iconfont icon-shangpin',
         102: 'iconfont icon-danju',
-        145: 'iconfont icon-baobiao',
+        145: 'iconfont icon-baobiao'
       },
       isCollapse: false,
       activePath: ''
     }
   },
   methods: {
-    getMenuList: async function () {
+    getMenuList: async function() {
       const { data: res } = await this.$http.get('menus')
       if (res.meta.status !== 200) {
         return this.$message.error(res.meta.msg)
       }
       this.menuList = res.data
     },
-    logout: function () {
+    logout: function() {
       window.sessionStorage.clear()
       this.$router.push('/login')
     },
-    toggleCollapse: function () {
+    toggleCollapse: function() {
       this.isCollapse = !this.isCollapse
     },
     saveNavState: function(activePath) {
@@ -93,10 +93,10 @@ export default {
       this.activePath = activePath
     }
   },
-  created: function () {
+  created: function() {
     this.getMenuList()
     this.activePath = window.sessionStorage.getItem('activePath')
-  },
+  }
 }
 </script>
 <style lang="less" scoped>

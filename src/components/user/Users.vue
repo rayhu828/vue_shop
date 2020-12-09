@@ -17,17 +17,11 @@
             :clearable="true"
             @clear="getUserList"
           >
-            <el-button
-              slot="append"
-              icon="el-icon-search"
-              @click="getUserList"
-            ></el-button>
+            <el-button slot="append" icon="el-icon-search" @click="getUserList"></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary" @click="addDialogVisible = true"
-            >添加用户</el-button
-          >
+          <el-button type="primary" @click="addDialogVisible = true">添加用户</el-button>
         </el-col>
       </el-row>
       <!-- 用户列表区域 -->
@@ -39,36 +33,15 @@
         <el-table-column label="角色" prop="role_name"></el-table-column>
         <el-table-column label="状态">
           <template slot-scope="scope">
-            <el-switch
-              v-model="scope.row.mg_state"
-              @change="userStateChanged(scope.row)"
-            >
-            </el-switch>
+            <el-switch v-model="scope.row.mg_state" @change="userStateChanged(scope.row)"></el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180px">
           <template>
-            <el-button
-              type="primary"
-              icon="el-icon-edit"
-              size="mini"
-            ></el-button>
-            <el-button
-              type="danger"
-              icon="el-icon-delete"
-              size="mini"
-            ></el-button>
-            <el-tooltip
-              effect="dark"
-              content="分配角色"
-              placement="top"
-              :enterable="false"
-            >
-              <el-button
-                type="warning"
-                icon="el-icon-setting"
-                size="mini"
-              ></el-button>
+            <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
+            <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+            <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
+              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -82,17 +55,11 @@
         :page-size="queryInfo.pagesize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="total"
-      >
-      </el-pagination>
+      ></el-pagination>
       <!-- 添加用户的对话框 -->
       <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="50%" @close="addDialogClose">
         <!-- 内容主体区域 -->
-        <el-form
-          :model="addForm"
-          :rules="addFormRules"
-          ref="addFormRef"
-          label-width="70px"
-        >
+        <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="70px">
           <el-form-item label="用户名" prop="username">
             <el-input v-model="addForm.username"></el-input>
           </el-form-item>
@@ -109,9 +76,7 @@
         <!-- 底部区域 -->
         <span slot="footer" class="dialog-footer">
           <el-button @click="addDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="addDialogVisible = false"
-            >确 定</el-button
-          >
+          <el-button type="primary" @click="addUser">确 定</el-button>
         </span>
       </el-dialog>
     </el-card>
@@ -119,7 +84,7 @@
 </template>
 <script>
 export default {
-  data: function () {
+  data: function() {
     var checkEmail = (rule, value, callback) => {
       // 验证邮箱的正则表达式
       const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/
@@ -140,7 +105,7 @@ export default {
       queryInfo: {
         query: '',
         pagenum: 1,
-        pagesize: 2,
+        pagesize: 2
       },
       userList: [],
       pagenum: 1,
@@ -150,64 +115,64 @@ export default {
         username: '',
         password: '',
         email: '',
-        mobile: '',
+        mobile: ''
       },
       addFormRules: {
         username: [
           {
             required: true,
             message: '请输入用户名',
-            trigger: 'blur',
+            trigger: 'blur'
           },
           {
             min: 3,
             max: 10,
             message: '用户名长度在3到10个字符之间',
-            trigger: 'blur',
-          },
+            trigger: 'blur'
+          }
         ],
         password: [
           {
             required: true,
             message: '请输入密码',
-            trigger: 'blur',
+            trigger: 'blur'
           },
           {
             min: 6,
             max: 15,
             message: '密码长度在6到15个字符之间',
-            trigger: 'blur',
-          },
+            trigger: 'blur'
+          }
         ],
         email: [
           {
             required: true,
             message: '请输入邮箱',
-            trigger: 'blur',
+            trigger: 'blur'
           },
           {
             validator: checkEmail,
-            trigger: 'blur',
-          },
+            trigger: 'blur'
+          }
         ],
         mobile: [
           {
             required: true,
             message: '请输入手机',
-            trigger: 'blur',
+            trigger: 'blur'
           },
           {
             validator: checkMobile,
-            trigger: 'blur',
-          },
-        ],
-      },
+            trigger: 'blur'
+          }
+        ]
+      }
     }
   },
   methods: {
-    getUserList: async function () {
+    getUserList: async function() {
       const { data: res } = await this.$http.get('users', {
-        params: this.queryInfo,
+        params: this.queryInfo
       })
       if (res.meta.status !== 200) {
         return this.$message.error(res.meta.msg)
@@ -217,17 +182,17 @@ export default {
       this.total = res.data.total
     },
     // 监听pagesize改变的事件
-    handleSizeChange: function (newSize) {
+    handleSizeChange: function(newSize) {
       this.queryInfo.pagesize = newSize
       this.getUserList()
     },
     // 监听页码值改变的事件
-    handleCurrentChange: function (newPage) {
+    handleCurrentChange: function(newPage) {
       this.queryInfo.pagenum = newPage
       this.getUserList()
     },
     // 监听switch开关状态的改变
-    userStateChanged: async function (userInfo) {
+    userStateChanged: async function(userInfo) {
       const { data: res } = await this.$http.put(
         `users/${userInfo.id}/state/${userInfo.mg_state}`
       )
@@ -239,11 +204,26 @@ export default {
     },
     addDialogClose: function() {
       this.$refs.addFormRef.resetFields()
+    },
+    addUser: function() {
+      this.$refs.addFormRef.validate(async valid => {
+        if (!valid) {
+          return
+        }
+        const { data: res } = await this.$http.post('users', this.addForm)
+        if (res.meta.status !== 201) {
+          userInfo.mg_state = !userInfo.mg_state
+          return this.$message.error(res.meta.msg)
+        }
+        this.$message.success(res.meta.msg)
+        this.addDialogVisible = false
+        this.getUserList()
+      })
     }
   },
-  created: function () {
+  created: function() {
     this.getUserList()
-  },
+  }
 }
 </script>
 <style lang="less" scoped>
