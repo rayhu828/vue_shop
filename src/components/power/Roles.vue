@@ -18,13 +18,49 @@
       <el-table :data="rolesList" :border="true" :stripe="true">
         <el-table-column type="expand">
           <template slot-scope="scope">
-            <el-row v-for="(item1) in scope.row.children" :key="item1.id">
+            <el-row
+              :class="['vcenter', 'bdbottom', i1 === 0 ? 'bdtop' : '']"
+              v-for="(item1, i1) in scope.row.children"
+              :key="item1.id"
+            >
               <!-- 渲染一级权限 -->
               <el-col :span="5">
-                <el-tag>{{item1.authName}}</el-tag>
+                <el-tag
+                  :closable="true"
+                  @close="remveRightsById(scope.row, item1.id)"
+                >{{item1.authName}}</el-tag>
+                <i class="el-icon-caret-right"></i>
               </el-col>
               <!-- 渲染二级权限和三级权限 -->
-              <el-col :span="19"></el-col>
+              <el-col :span="19">
+                <el-row
+                  :class="['vcenter', i2 === 0 ? '' : 'bdtop']"
+                  v-for="(item2, i2) in item1.children"
+                  :key="item2.id"
+                >
+                  <el-col :span="6">
+                    <el-tag
+                      type="success"
+                      :closable="true"
+                      @close="remveRightsById(scope.row, item2.id)"
+                    >{{item2.authName}}</el-tag>
+                    <i class="el-icon-caret-right"></i>
+                  </el-col>
+                  <el-col :span="18">
+                    <el-row>
+                      <el-col :span="24">
+                        <el-tag
+                          type="warning"
+                          v-for="(item3) in item2.children"
+                          :key="item3.id"
+                          :closable="true"
+                          @close="remveRightsById(scope.row, item3.id)"
+                        >{{item3.authName}}</el-tag>
+                      </el-col>
+                    </el-row>
+                  </el-col>
+                </el-row>
+              </el-col>
             </el-row>
           </template>
         </el-table-column>
@@ -176,6 +212,31 @@ export default {
       }
       this.$message.success(res.meta.msg)
       this.getRolesList()
+    },
+    remveRightsById: async function(role, rightId) {
+      const confirmResult = await this.$confirm(
+        '此操作将永久删除该用户, 是否继续?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).catch(error => {
+        return error
+      })
+      // 如果用户确认删除，返回值是字符串'confirm'
+      // 如果用户点击取消，返回值是字符串'cancel'
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('已经取消删除')
+      }
+      const { data: res } = await this.$http.delete(
+        `roles/${role.id}/rights/${rightId}`
+      )
+      if (res.meta.status !== 200) {
+        return this.$message.error(res.meta.msg)
+      }
+      role.children = res.data
     }
   },
   created: function() {
@@ -184,4 +245,17 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+.el-tag {
+  margin: 7px;
+}
+.bdtop {
+  border-top: 1px solid #eeeeee;
+}
+.bdbottom {
+  border-bottom: 1px solid #eeeeee;
+}
+.vcenter {
+  display: flex;
+  align-items: center;
+}
 </style>
