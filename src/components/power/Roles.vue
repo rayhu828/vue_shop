@@ -81,7 +81,12 @@
               size="mini"
               @click="removeRolesById(scope.row.id)"
             >删除</el-button>
-            <el-button type="warning" icon="el-icon-setting" size="mini">分配权限</el-button>
+            <el-button
+              type="warning"
+              icon="el-icon-setting"
+              size="mini"
+              @click="showSetRightsDialog(scope.row)"
+            >分配权限</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -124,6 +129,27 @@
           <el-button type="primary" @click="editRoles">确 定</el-button>
         </span>
       </el-dialog>
+      <!-- 分配权限的对话框 -->
+      <el-dialog
+        title="分配权限"
+        :visible.sync="setRightsDialogVisible"
+        width="50%"
+        @close="setRightsDialogClose"
+      >
+        <!-- 树形控件 -->
+        <el-tree
+          :data="rightsList"
+          :props="treeProps"
+          :show-checkbox="true"
+          node-key="id"
+          :default-expand-all="true"
+          :default-checked-keys="defKeys"
+        ></el-tree>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="setRightsDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="setRightsDialogVisible = false">确 定</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -138,7 +164,14 @@ export default {
         roleDesc: ''
       },
       editDialogVisible: false,
-      editForm: {}
+      editForm: {},
+      setRightsDialogVisible: false,
+      rightsList: [],
+      treeProps: {
+        children: 'children',
+        label: 'authName'
+      },
+      defKeys: []
     }
   },
   methods: {
@@ -237,6 +270,26 @@ export default {
         return this.$message.error(res.meta.msg)
       }
       role.children = res.data
+    },
+    showSetRightsDialog: async function(role) {
+      const { data: res } = await this.$http.get(`rights/tree`)
+      if (res.meta.status !== 200) {
+        return this.$message.error(res.meta.msg)
+      }
+      this.rightsList = res.data
+      this.getLeafKeys(role, this.defKeys)
+      this.setRightsDialogVisible = true
+    },
+    getLeafKeys: function(node, arr) {
+      if (!node.children) {
+        return arr.push(node.id)
+      }
+      node.children.forEach(value => {
+        this.getLeafKeys(value, arr)
+      })
+    },
+    setRightsDialogClose: function() {
+      this.defKeys = []
     }
   },
   created: function() {
