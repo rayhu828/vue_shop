@@ -20,7 +20,12 @@
         <el-step title="完成"></el-step>
       </el-steps>
       <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-position="top">
-        <el-tabs :tab-position="tabPosition" v-model="activeIndex" :before-leave="beforeTabLeave">
+        <el-tabs
+          :tab-position="tabPosition"
+          v-model="activeIndex"
+          :before-leave="beforeTabLeave"
+          @tab-click="tabClicked"
+        >
           <el-tab-pane label="基本信息" name="0">
             <el-form-item label="商品名称" prop="goods_name">
               <el-input v-model="addForm.goods_name"></el-input>
@@ -109,7 +114,8 @@ export default {
         value: 'cat_id',
         label: 'cat_name',
         children: 'children'
-      }
+      },
+      manyTableData: []
     }
   },
   methods: {
@@ -126,15 +132,40 @@ export default {
       this.cateList = res.data
     },
     handleChange: function() {
-      if(this.addForm.goods_cat.length !== 3) {
+      if (this.addForm.goods_cat.length !== 3) {
         this.addForm.goods_cat = []
       }
     },
     beforeTabLeave: function(activeName, oldActiveName) {
-      if(oldActiveName === '0' && this.addForm.goods_cat.length !== 3) {
+      if (oldActiveName === '0' && this.addForm.goods_cat.length !== 3) {
         this.$message.error('请先选择商品分类')
         return false
       }
+    },
+    tabClicked: async function() {
+      if (this.activeIndex === '1') {
+        let queryObj = {
+          sel: 'many'
+        }
+        const { data: res } = await this.$http.get(
+          `categories/${this.cateId}/attributes`,
+          {
+            params: queryObj
+          }
+        )
+        if (res.meta.status !== 200) {
+          return this.$message.error(res.meta.msg)
+        }
+        this.manyTableData = res.data
+      }
+    }
+  },
+  computed: {
+    cateId: function() {
+      if(this.addForm.goods_cat.length === 3) {
+        return this.addForm.goods_cat[2]
+      }
+      return null
     }
   },
   created: function() {
