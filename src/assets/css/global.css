@@ -36,3 +36,7 @@ html,
 .el-step__title {
     font-size: 12px;
 }
+
+.ql-editor {
+    min-height: 300px;
+}

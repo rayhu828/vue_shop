@@ -49,16 +49,53 @@
               ></el-cascader>
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane label="商品参数" name="1">商品参数</el-tab-pane>
-          <el-tab-pane label="商品属性" name="2">商品属性</el-tab-pane>
-          <el-tab-pane label="商品图片" name="3">商品图片</el-tab-pane>
-          <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
+          <el-tab-pane label="商品参数" name="1">
+            <el-form-item
+              :label="item.attr_name"
+              v-for="(item) in manyTableData"
+              :key="item.attr_id"
+            >
+              <el-checkbox-group v-model="item.attr_vals">
+                <el-checkbox :label="cb" v-for="(cb, i) in item.attr_vals" :key="i" :border="true"></el-checkbox>
+              </el-checkbox-group>
+            </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane label="商品属性" name="2">
+            <el-form-item
+              :label="item.attr_name"
+              v-for="(item) in onlyTableData"
+              :key="item.attr_id"
+            >
+              <el-input v-model="item.attr_vals"></el-input>
+            </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane label="商品图片" name="3">
+            <el-upload
+              :action="uploadURL"
+              :on-preview="handlePreview"
+              :on-remove="handleRemove"
+              list-type="picture"
+              :headers="headerObj"
+              :on-success="handleSuccess"
+            >
+              <el-button size="small" type="primary">点击上传</el-button>
+            </el-upload>
+          </el-tab-pane>
+          <el-tab-pane label="商品内容" name="4">
+            <quill-editor v-model="addForm.goods_introduce"></quill-editor>
+            <el-button type="primary" class="btnAdd" @click="add">添加商品</el-button>
+          </el-tab-pane>
         </el-tabs>
       </el-form>
+      <!-- 图片预览 -->
+      <el-dialog title="图片预览" :visible.sync="previewVisible" width="30%">
+        <img :src="previewPath" class="previewImg" />
+      </el-dialog>
     </el-card>
   </div>
 </template>
 <script>
+import _ from 'lodash'
 export default {
   data: function() {
     return {
@@ -69,7 +106,10 @@ export default {
         goods_price: 0,
         goods_weight: 0,
         goods_number: 0,
-        goods_cat: []
+        goods_cat: [],
+        pics: [],
+        goods_introduce: '',
+        attrs: []
       },
       addFormRules: {
         goods_name: [
@@ -115,7 +155,14 @@ export default {
         label: 'cat_name',
         children: 'children'
       },
-      manyTableData: []
+      manyTableData: [],
+      onlyTableData: [],
+      uploadURL: 'http://127.0.0.1:8888/api/private/v1/upload',
+      headerObj: {
+        Authorization: window.sessionStorage.getItem('token')
+      },
+      previewPath: '',
+      previewVisible: false
     }
   },
   methods: {
@@ -144,25 +191,99 @@ export default {
     },
     tabClicked: async function() {
       if (this.activeIndex === '1') {
-        let queryObj = {
+        let manyObj = {
           sel: 'many'
         }
         const { data: res } = await this.$http.get(
           `categories/${this.cateId}/attributes`,
           {
-            params: queryObj
+            params: manyObj
           }
         )
         if (res.meta.status !== 200) {
           return this.$message.error(res.meta.msg)
         }
+        res.data.forEach(item => {
+          if (item.attr_vals.length === 0) {
+            item.attr_vals = []
+          }
+          item.attr_vals = item.attr_vals.split(' ')
+        })
         this.manyTableData = res.data
       }
+      if (this.activeIndex === '2') {
+        let onlyObj = {
+          sel: 'only'
+        }
+        const { data: res } = await this.$http.get(
+          `categories/${this.cateId}/attributes`,
+          {
+            params: onlyObj
+          }
+        )
+        if (res.meta.status !== 200) {
+          return this.$message.error(res.meta.msg)
+        }
+        this.onlyTableData = res.data
+      }
+    },
+    handlePreview: function(file) {
+      this.previewPath = file.response.data.url
+      this.previewVisible = true
+    },
+    handleRemove: function(file) {
+      // 获取需要移除图片的临时路径
+      let filePath = file.response.data.tmp_path
+      // 从pics数组中，找到需要移除图片对应的索引值
+      let index = this.addForm.pics.findIndex(item => {
+        return item.pic === filePath
+      })
+      // 根据索引值，从pics数组中移除
+      this.addForm.pics.splice(index, 1)
+    },
+    handleSuccess: function(response) {
+      let picInfo = {
+        pic: response.data.tmp_path
+      }
+      this.addForm.pics.push(picInfo)
+    },
+    add: function() {
+      this.$refs.addFormRef.validate(async valid => {
+        if (!valid) {
+          return this.$message.error('请填写必要的表单项目')
+        }
+        // lodash深拷贝 cloneDeep(obj)
+        let form = _.cloneDeep(this.addForm)
+        form.goods_cat = form.goods_cat.join(',')
+        // 处理动态参数
+        this.manyTableData.forEach(item => {
+          let newInfo = {
+            attr_id: item.attr_id,
+            attr_value: item.attr_vals.join(' ')
+          }
+          this.addForm.attrs.push(newInfo)
+        })
+        // 处理静态属性
+        this.onlyTableData.forEach(item => {
+          let newInfo = {
+            attr_id: item.attr_id,
+            attr_value: item.attr_vals
+          }
+          this.addForm.attrs.push(newInfo)
+        })
+        form.attrs = this.addForm.attrs
+        const { data: res } = await this.$http.post('goods', form)
+        if (res.meta.status !== 201) {
+          return this.$message.error(res.meta.msg)
+        }
+        this.$message.success('添加商品成功')
+        this.$router.push('/goods')
+      })
     }
   },
   computed: {
     cateId: function() {
-      if(this.addForm.goods_cat.length === 3) {
+      if (this.addForm.goods_cat.length === 3) {
         return this.addForm.goods_cat[2]
       }
       return null
@@ -174,4 +295,13 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+.el-checkbox {
+  margin: 0 10px 0 0 !important;
+}
+.previewImg {
+  width: 100%;
+}
+.btnAdd {
+  margin-top: 15px;
+}
 </style>
