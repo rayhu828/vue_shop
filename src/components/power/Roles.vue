@@ -15,7 +15,7 @@
         </el-col>
       </el-row>
       <!-- 角色列表区域 -->
-      <el-table :data="rolesList" :border="true" :stripe="true" row-key="id">
+      <el-table :data="rolesList" :border="true" :stripe="true">
         <el-table-column type="expand">
           <template slot-scope="scope">
             <el-row
