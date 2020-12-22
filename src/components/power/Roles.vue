@@ -15,7 +15,7 @@
         </el-col>
       </el-row>
       <!-- 角色列表区域 -->
-      <el-table :data="rolesList" :border="true" :stripe="true">
+      <el-table :data="rolesList" :border="true" :stripe="true" row-key="id">
         <el-table-column type="expand">
           <template slot-scope="scope">
             <el-row
@@ -213,10 +213,7 @@ export default {
         roleName: this.editForm.roleName,
         roleDesc: this.editForm.roleDesc
       }
-      const { data: res } = await this.$http.put(
-        `roles/${this.editForm.roleId}`,
-        editRolesInfo
-      )
+      const { data: res } = await this.$http.put(`roles/${this.editForm.roleId}`, editRolesInfo)
       if (res.meta.status !== 200) {
         return this.$message.error(res.meta.msg)
       }
@@ -225,15 +222,11 @@ export default {
       this.getRolesList()
     },
     removeRolesById: async function(id) {
-      const confirmResult = await this.$confirm(
-        '此操作将永久删除该用户, 是否继续?',
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      ).catch(error => {
+      const confirmResult = await this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(error => {
         return error
       })
       // 如果用户确认删除，返回值是字符串'confirm'
@@ -249,15 +242,11 @@ export default {
       this.getRolesList()
     },
     remveRightsById: async function(role, rightId) {
-      const confirmResult = await this.$confirm(
-        '此操作将永久删除该用户, 是否继续?',
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      ).catch(error => {
+      const confirmResult = await this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(error => {
         return error
       })
       // 如果用户确认删除，返回值是字符串'confirm'
@@ -265,9 +254,7 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('已经取消删除')
       }
-      const { data: res } = await this.$http.delete(
-        `roles/${role.id}/rights/${rightId}`
-      )
+      const { data: res } = await this.$http.delete(`roles/${role.id}/rights/${rightId}`)
       if (res.meta.status !== 200) {
         return this.$message.error(res.meta.msg)
       }
@@ -295,10 +282,7 @@ export default {
       this.defKeys = []
     },
     allotRights: async function() {
-      const keys = [
-        ...this.$refs.treeRef.getCheckedKeys(),
-        ...this.$refs.treeRef.getHalfCheckedKeys()
-      ]
+      const keys = [...this.$refs.treeRef.getCheckedKeys(), ...this.$refs.treeRef.getHalfCheckedKeys()]
       const idStr = keys.join(',')
       const { data: res } = await this.$http.post(`roles/${this.roleId}/rights`, {
         rids: idStr
